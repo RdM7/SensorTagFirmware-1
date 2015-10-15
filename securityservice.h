@@ -1,5 +1,5 @@
-#ifndef securitySERVICE_H
-#define securitySERVICE_H
+#ifndef SECURITYSERVICE_H
+#define SECURITYSERVICE_H
 
 #ifdef __cplusplus
 extern "C"
@@ -23,22 +23,22 @@ extern "C"
 #define MW_UUID_SIZE        ATT_UUID_SIZE
 #define MW_UUID(uuid)       MW_BASE_UUID_128(uuid)
  
-// security Service Parameters
-#define security_VALUE                     0
+// SECURITY Service Parameters
+#define SECURITY_VALUE                     0
 
 // Service UUID
-#define security_SERV_UUID               0x9914  // 3E099914-293F-11E4-93BD-AFD0FE6D1DFD
-#define security_DataPublicKey_UUID              0x9915 //holds the public key
-#define security_DatarcvdSecret_UUID              0x9916 // holds the rcvd_secret
-#define security_DataFlag_UUID              0x9917 //holds the flag value . TRUE when secret = rcvd_secret.
+#define SECURITY_SERV_UUID               0x9923  // 3E099915-293F-11E4-93BD-AFD0FE6D1DFD
 
-// Characteristic UUID
-#define security_PublicKey_UUID 	     0x9918
-#define security_rcvdSecret_UUID         0x9919
-#define security_Flag_UUID               0x9920 
+
+#define PUBLIC_DATA_UUID    0x9915 //holds the public key
+#define RCVD_DATA_UUID      0x9916 // holds the rcvd_secret
+#define FLAG_DATA_UUID      0x9917 //holds the flag value . TRUE when secret = rcvd_secret.
+#define SECURITY_DATA_UUID  0x9919
+
+
   
-// security length
-#define security_DATA_LEN                       20
+// SECURITY length
+#define SECURITY_DATA_LEN                       10
 
 /*********************************************************************
  * TYPEDEFS
@@ -62,7 +62,7 @@ extern "C"
  */
 
 /*
- * security_AddService- Initializes the security service by registering
+ * SECURITY_AddService- Initializes the SECURITY service by registering
  *          GATT attributes with the GATT server.
  *
  */
@@ -70,9 +70,9 @@ extern "C"
 extern bStatus_t security_AddService(uint32 services );
 
 /*********************************************************************
- * @fn      security_SetParameter
+ * @fn      SECURITY_SetParameter
  *
- * @brief   Set a security parameter.
+ * @brief   Set a SECURITY parameter.
  *
  * @param   param - Profile parameter ID
  * @param   len - length of data to right
@@ -86,7 +86,7 @@ extern bStatus_t security_AddService(uint32 services );
 bStatus_t security_SetParameter( uint8 param, uint8 len, void *value );
 
 /*
- * security_GetParameter - Get a security parameter.
+ * SECURITY_GetParameter - Get a SECURITY parameter.
  *
  *    param - Profile parameter ID
  *    value - pointer to data to write.  This is dependent on
@@ -94,7 +94,7 @@ bStatus_t security_SetParameter( uint8 param, uint8 len, void *value );
  *          data type (example: data type of uint16 will be cast to
  *          uint16 pointer).
  */
-extern bStatus_t security_GetParameter( uint8 param, void *value );
+extern bStatus_t Ssecurity_GetParameter( uint8 param, void *value );
 
 /*********************************************************************
 *********************************************************************/
@@ -103,4 +103,4 @@ extern bStatus_t security_GetParameter( uint8 param, void *value );
 }
 #endif
 
-#endif /* securitySERVICE_H */
+#endif /* SECURITYSERVICE_H */

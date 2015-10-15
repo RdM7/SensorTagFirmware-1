@@ -20,10 +20,12 @@
  */
 
 /* Service configuration values */
-#define security_SERVICE_UUID    security_SERV_UUID
+#define SECURITY_SERVICE_UUID    SECURITY_SERV_UUID
 
 /*********************************************************************
  * TYPEDEFS
+
+ *
  */
 
 /*********************************************************************
@@ -33,92 +35,72 @@
 // Service UUID
 static CONST uint8 securityServiceUUID[MW_UUID_SIZE] =
 {
-  MW_UUID(security_SERVICE_UUID), //0x9914
+  MW_UUID(SECURITY_SERVICE_UUID),
 };
+
 
 // Data UUID: data
-static CONST uint8 securityDataUUID[MW_UUID_SIZE] =
+CONST uint8 securityDataUUID[MW_UUID_SIZE] =
 {
-  MW_UUID(security_DATA_UUID),
+  MW_UUID(SECURITY_DATA_UUID),
 };
 
-static CONST uint8 PublicKeyDataUUID[MW_UUID_SIZE] =
+ CONST uint8 PublicKeyDataUUID[MW_UUID_SIZE] =
 {
-  MW_UUID(security_DataPublicKey_UUID ), //0x9915
+  MW_UUID(PUBLIC_DATA_UUID),
 };
 
-static CONST uint8 rcvdSecretDataUUID[MW_UUID_SIZE] =
+ CONST uint8 rcvdSecretDataUUID[MW_UUID_SIZE] =
 {
-  MW_UUID(security_DatarcvdSecret_UUID), //0x9916
+  MW_UUID(RCVD_DATA_UUID),
 };
 
-static CONST uint8 FlagDataUUID[MW_UUID_SIZE] =
+ CONST uint8 FlagDataUUID[MW_UUID_SIZE] =
 {
-  MW_UUID(security_DataFlag_UUID ), //0x9917
+  MW_UUID(FLAG_DATA_UUID),
 };
+
+ // Profile Service attribute
+ static CONST gattAttrType_t securityService = { MW_UUID_SIZE, securityServiceUUID };
 
 //Charactersitc UUID
 
-CONST uint8 publicKeyUUID[MW_UUID_SIZE] =
-{ 
-  MW_UUID(security_PublicKey_UUID); //0x9918
-};
+ //Public Key Characteristic
+ static uint8 pubKeyProps = GATT_PROP_READ;
+ static uint8 pubKeyVal[SECURITY_DATA_LEN+1] = "Public Key";
 
-CONST uint8 rcvdSecretUUID[MW_UUID_SIZE] =
-{ 
-  MW_UUID(security_rcvdSecret_UUID); //0x9919
-};
+ //Public Key Characteristic
+ static uint8 rcvdSecProps = GATT_PROP_READ;
+ static uint8 rcvdSecVal[SECURITY_DATA_LEN+1] = "";
 
-CONST uint8 FlagUUID[MW_UUID_SIZE] =
-{ 
-  MW_UUID(security_Flag_UUID); //0x9920
-};
+ //Public Key Characteristic
+ static uint8 FlagProps = GATT_PROP_READ;
+ static uint8 FlagVal[SECURITY_DATA_LEN+1] = "Flag Status";
 
+//Security Data Characterstic
+ static uint8 securityDataProps = GATT_PROP_READ;
+ static uint8 securityData[SECURITY_DATA_LEN] = { 0 };
 
-
-
-/*********************************************************************
- * EXTERNAL VARIABLES
- */
-
-/*********************************************************************
- * EXTERNAL FUNCTIONS
- */
-
-/*********************************************************************
- * LOCAL VARIABLES
- */
-
+ static int secret = 4321; //sample
 
 /*********************************************************************
  * Profile Attributes - variables
- */
 
-// Profile Service attribute
-static CONST gattAttrType_t securityService = { MW_UUID_SIZE, securityServiceUUID };
 
 // Characteristic Value: data
-static uint8 securityData[security_DATA_LEN] = { 0 };
-static uint8 publicKey[security_DATA_LEN] = {1234}; //sample
-static uint8 rcvdSecret[security_DATA_LEN] = {0};
-static uint8 FlagRx[security_DATA_LEN] = {0};
-static uint8 secret = {4321}; //sample
 
-// Characteristic Properties: data
-static uint8 securityDataProps = GATT_PROP_READ | GATT_PROP_WRITE;
-static uint8 publicKeyDataProps = GATT_PROP_READ;
-static uint8 rcvdKeyDataProps = GATT_PERMIT_WRITE;
-static uint8 FlagDataProps = GATT_PERMIT_READ;
+
+
 
 
 /*********************************************************************
- * Profile Attributes - Table
- */
+*/
 
 static gattAttribute_t securityAttrTable[] =
 {
   {
     // Service declaration
+
     { ATT_BT_UUID_SIZE, primaryServiceUUID },   /* type */
       GATT_PERMIT_READ,                         /* permissions */
       0,                                        /* handle */
@@ -141,21 +123,22 @@ static gattAttribute_t securityAttrTable[] =
         securityData
     },
 //-----------------------------------------------
-	
+
 	//Public Key Characteristic Declaration
 	{
 		{ATT_BT_UUID_SIZE,characterUUID},
 		GATT_PERMIT_READ,
-		0,
-		&publicKeyDataProps
+		1,
+		&pubKeyProps
 	},
 	
 	//Public Key Value (DATA)
 	{
-		{ATT_BT_UUID_SIZE,publicKeyDataUUID},
+		{MW_UUID_SIZE,PublicKeyDataUUID},
 		GATT_PERMIT_READ,
-		0,
-		&publicKey
+		1,
+		pubKeyVal
+
 	},
 //-------------------------------------------------	
 	
@@ -165,16 +148,16 @@ static gattAttribute_t securityAttrTable[] =
 	{
 		{ATT_BT_UUID_SIZE,characterUUID},
 		GATT_PERMIT_READ,
-		0,
-		&rcvdKeyDataProps
+		2,
+		&rcvdSecProps
 	},
 	
 	//Received Secret Value (DATA)
 	{
-		{ATT_BT_UUID_SIZE,rcvdSecretDataUUID},
+		{MW_UUID_SIZE,rcvdSecretDataUUID},
 		GATT_PERMIT_WRITE,
-		0,
-		&rcvdSecret
+		2,
+		rcvdSecVal
 	},
 //-------------------------------------------------	
 
@@ -184,16 +167,16 @@ static gattAttribute_t securityAttrTable[] =
 	{
 		{ATT_BT_UUID_SIZE,characterUUID},
 		GATT_PERMIT_READ,
-		0,
-		&FlagDataProps
+		3,
+		&FlagProps
 	},
 	
 	//Public Key Value (DATA)
 	{
-		{ATT_BT_UUID_SIZE,FlagDataUUID},
+		{MW_UUID_SIZE,FlagDataUUID},
 		GATT_PERMIT_READ,
-		0,
-		&FlagRx
+		3,
+		FlagVal
 	},
 //-------------------------------------------------	
 	
@@ -269,7 +252,7 @@ bStatus_t security_AddService(uint32 services)
  *          uint16 pointer).
  *
  * @return  bStatus_t
- */
+
 bStatus_t security_SetParameter( uint8 param, uint8 len, void *value )
 {
   bStatus_t ret = SUCCESS;
@@ -309,7 +292,7 @@ bStatus_t security_SetParameter( uint8 param, uint8 len, void *value )
  *          uint16 pointer).
  *
  * @return  bStatus_t
- */
+
 bStatus_t security_GetParameter( uint8 param, void *value )
 {
   bStatus_t ret = SUCCESS;
@@ -327,6 +310,7 @@ bStatus_t security_GetParameter( uint8 param, void *value )
 
   return ( ret );
 }
+*/
 
 /*********************************************************************
  * @fn          security_ReadAttrCB
@@ -340,7 +324,7 @@ bStatus_t security_GetParameter( uint8 param, void *value )
  * @param       pLen - length of data to be read
  * @param       offset - offset of the first octet to be read
  * @param       maxLen - maximum length of data to be read
- *
+
  * @return      Success or Failure
  */
 static uint8 security_ReadAttrCB( uint16_t connHandle, gattAttribute_t *pAttr,
@@ -374,25 +358,26 @@ static uint8 security_ReadAttrCB( uint16_t connHandle, gattAttribute_t *pAttr,
   {
     // No need for "GATT_SERVICE_UUID" or "GATT_CLIENT_CHAR_CFG_UUID" cases;
     // gattserverapp handles those reads
-    case security_DATA_UUID:
-      *pLen = security_DATA_LEN;
+    case SECURITY_DATA_UUID:
+      *pLen = SECURITY_DATA_LEN;
       // copy current security value in securityData[0] to the buffer pointed to by pValue
-      memcpy( pValue, &securityData[0], security_DATA_LEN );
+      memcpy( pValue, &securityData[0], SECURITY_DATA_LEN );
       securityData[0]++;
       break;
 	  
-	  case security_DataPublicKey_UUID:
-      *pLen = security_DATA_LEN;
+	  case PUBLIC_DATA_UUID:
+      *pLen = SECURITY_DATA_LEN;
       // copy current security value in publicKey[0] to the buffer pointed to by pValue
-      memcpy( pValue, &publicKey[0], security_DATA_LEN );
-      publicKey[0]= 1234;
+      memcpy( pValue, &pubKeyVal[0], SECURITY_DATA_LEN );
+
+
       break;
 	  
-	  case security_DataFlag_UUID:
-      *pLen = security_DATA_LEN;
+	  case FLAG_DATA_UUID:
+      *pLen = SECURITY_DATA_LEN;
       // copy current security value in FlagRx[0] to the buffer pointed to by pValue
-      memcpy( pValue, &FlagRx[0], security_DATA_LEN );
-      FlagRx[0]=1;
+      memcpy( pValue, &FlagVal[0], SECURITY_DATA_LEN );
+      FlagVal[0]=1;
       break;
 
     default:
@@ -440,7 +425,7 @@ static bStatus_t security_WriteAttrCB( uint16_t connHandle, gattAttribute_t *pAt
 
   switch ( uuid )
   {
-    case security_DATA_UUID:
+    case SECURITY_DATA_UUID:
       // validate
       if ( offset != 0 ) 
       {
@@ -470,7 +455,7 @@ static bStatus_t security_WriteAttrCB( uint16_t connHandle, gattAttribute_t *pAt
       }
       break;
 	  
-	  case security_DatarcvdSecret_UUID:
+	  case RCVD_DATA_UUID:
       // validate
       if ( offset != 0 ) 
       {
@@ -495,7 +480,7 @@ static bStatus_t security_WriteAttrCB( uint16_t connHandle, gattAttribute_t *pAt
         *pCurValue = pValue[0];
 
         // save new value in variable        
-        rcvdSecret[0] = pValue[0];
+        rcvdSecVal[0] = pValue[0];
        // HalLedSet(HAL_LED_1, HAL_LED_MODE_ON );
       }
       break;
